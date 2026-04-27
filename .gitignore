@@ -1,0 +1,32 @@
+# --- PRIVATE CREDENTIALS (CRITICAL) ---
+# This hides your DB and Gmail passwords
+src/java/com/ebook/Helper/db.properties
+
+# This hides your Razorpay API keys
+src/java/com/ebook/config/razorpay.properties
+
+# --- NETBEANS & BUILD FILES ---
+build/
+dist/
+nbproject/private/
+nbproject/Makefile-*.mk
+nbproject/Package-*.bash
+nbactions.xml
+nb-configuration.xml
+
+# --- COMPILED FILES ---
+*.class
+*.war
+*.ear
+
+# --- OS TEMPORARY FILES ---
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+# Linux (Ubuntu)
+.DS_Store
+.directory
+
+# --- LOG FILES ---
+*.log
