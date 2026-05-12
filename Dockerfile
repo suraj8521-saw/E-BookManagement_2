@@ -1,18 +1,22 @@
-# Tomcat 10.1 (Stable Version)
+# Tomcat 10.1 JDK 17 (Stable)
 FROM tomcat:10.1-jdk17-openjdk-slim
 
-# Default apps saaf karein
-RUN rm -rf /usr/local/tomcat/webapps/*
+WORKDIR /usr/local/tomcat
 
-# 1. Pura project folder 'webapps-javaee' mein dalo
-# Tomcat 10 isse automatically 'javax' se 'jakarta' mein convert kar dega
-COPY web/ /usr/local/tomcat/webapps-javaee/ROOT/
+# Purane files delete karein
+RUN rm -rf webapps/*
 
-# 2. Src folder ko classes mein dalo (Imports resolution ke liye)
-COPY src/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/classes/
+# 1. Pura 'web' folder copy karein (isme libraries aur JSP hain)
+COPY web/ webapps-javaee/ROOT/
 
-# 3. JAR Libraries copy karein (Jo image_d43a6a.png mein hain)
-COPY web/WEB-INF/lib/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/lib/
+# 2. 'src' folder ko ek temporary folder mein copy karein
+COPY src/ /tmp/src/
+
+# 3. THE MAGIC STEP: Railway server par hi Java code ko compile karein
+# Ye step saari .java files dhundega aur unhe .class mein convert karke sahi jagah daal dega
+RUN mkdir -p webapps-javaee/ROOT/WEB-INF/classes && \
+    find /tmp/src -name "*.java" > /tmp/sources.txt && \
+    javac -cp "webapps-javaee/ROOT/WEB-INF/lib/*" -d webapps-javaee/ROOT/WEB-INF/classes @/tmp/sources.txt
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
