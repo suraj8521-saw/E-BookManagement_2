@@ -11,20 +11,32 @@ public class ConnectionProvider {
     public static Connection getConnection() {
         try {
             if (con == null || con.isClosed()) {
-                // 1. Load the secret properties file
+                // 1. Properties file load karein (Sirf URL aur User ke liye)
                 Properties props = new Properties();
                 InputStream is = ConnectionProvider.class.getClassLoader().getResourceAsStream("com/ebook/Helper/db.properties");
-                props.load(is);
+                if (is != null) {
+                    props.load(is);
+                }
 
-                // 2. Load the Driver (The way you know works)
-                Class.forName("com.mysql.jdbc.Driver"); 
+                // 2. Railway Environment Variables check karein (Higher Priority)
+                // Agar Railway dashboard mein set hai, toh wahi uthayega
+                String dbUrl = props.getProperty("db.url");
+                String dbUser = props.getProperty("db.user");
                 
-                // 3. Connect directly
-                con = DriverManager.getConnection(
-                    props.getProperty("db.url"), 
-                    props.getProperty("db.user"), 
-                    props.getProperty("db.password")
-                );
+                // Sabse zaroori change: Direct Environment Variable read karna
+                String dbPass = System.getenv("DB_PASSWORD"); 
+
+                // Agar environment variable null hai (local testing ke liye), toh props file se lo
+                if (dbPass == null) {
+                    dbPass = props.getProperty("db.password");
+                }
+
+                // 3. Driver load karein
+                Class.forName("com.mysql.cj.jdbc.Driver"); 
+                
+                // 4. Connection establish karein
+                con = DriverManager.getConnection(dbUrl, dbUser, dbPass);
+                System.out.println("Database Connected Successfully via Environment Variables!");
             }
         } catch (Exception e) {
             System.out.println("Connection Error: " + e.getMessage());
