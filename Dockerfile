@@ -1,12 +1,16 @@
-# Stable version jo Railway par chalta hai
-FROM tomcat:9-jdk17-openjdk-slim
+# Latest stable Tomcat 9 image jo cgroupv2 issues ko fix karti hai
+FROM tomcat:9.0.89-jdk17-openjdk-slim
 
-# Purane files delete karein
+# Purane webapps folder ko saaf karna
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Files copy karein
+# Pura 'web' folder copy karna (JSP, CSS, images ke liye)
 COPY web/ /usr/local/tomcat/webapps/ROOT/
+
+# Compiled Java classes ko copy karna
 COPY src/ /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
+
+# External libraries (JARs) copy karna - MySQL connection ke liye zaroori hai
 COPY web/WEB-INF/lib/ /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
 
 EXPOSE 8080
