@@ -1,21 +1,18 @@
-# Tomcat 10.1 use karein (Crash fix ke liye)
+# Tomcat 10.1 (Stable Version)
 FROM tomcat:10.1-jdk17-openjdk-slim
 
-# Purane webapps delete karein
+# Default apps saaf karein
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# 1. 'web' folder copy karein (JSP aur static files ke liye)
+# 1. Pura project folder 'webapps-javaee' mein dalo
+# Tomcat 10 isse automatically 'javax' se 'jakarta' mein convert kar dega
 COPY web/ /usr/local/tomcat/webapps-javaee/ROOT/
 
-# 2. 'src' folder copy karein (Agar Tomcat ko JSP compile karni pade)
+# 2. Src folder ko classes mein dalo (Imports resolution ke liye)
 COPY src/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/classes/
 
-# 3. JAR Libraries (Jo image_d43a6a.png mein hain)
+# 3. JAR Libraries copy karein (Jo image_d43a6a.png mein hain)
 COPY web/WEB-INF/lib/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/lib/
-
-# 4. CRITICAL STEP: Agar build folder hai toh classes copy karein
-# Isse JSP resolution error (Resolves to a package) khatam ho jayegi
-COPY build/web/WEB-INF/classes/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/classes/ 2>/dev/null || :
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
