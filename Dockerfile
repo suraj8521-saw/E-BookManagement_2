@@ -1,22 +1,19 @@
-# Tomcat 10.1 JDK 17 (Stable)
-FROM tomcat:10.1-jdk17-openjdk-slim
+# Railway ke naye Linux environment ke liye sabse stable Tomcat 9
+FROM tomcat:9.0-jdk17-corretto
 
 WORKDIR /usr/local/tomcat
 
 # Purane files delete karein
 RUN rm -rf webapps/*
 
-# 1. Pura 'web' folder copy karein (isme libraries aur JSP hain)
-COPY web/ webapps-javaee/ROOT/
+# 1. Pura web folder copy karein (Standard Tomcat 9 structure)
+COPY web/ webapps/ROOT/
 
-# 2. 'src' folder ko ek temporary folder mein copy karein
-COPY src/ /tmp/src/
+# 2. Pura src folder (Compiled classes) copy karein
+COPY src/ webapps/ROOT/WEB-INF/classes/
 
-# 3. THE MAGIC STEP: Railway server par hi Java code ko compile karein
-# Ye step saari .java files dhundega aur unhe .class mein convert karke sahi jagah daal dega
-RUN mkdir -p webapps-javaee/ROOT/WEB-INF/classes && \
-    find /tmp/src -name "*.java" > /tmp/sources.txt && \
-    javac -cp "webapps-javaee/ROOT/WEB-INF/lib/*" -d webapps-javaee/ROOT/WEB-INF/classes @/tmp/sources.txt
+# 3. Libraries copy karein
+COPY web/WEB-INF/lib/ webapps/ROOT/WEB-INF/lib/
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
