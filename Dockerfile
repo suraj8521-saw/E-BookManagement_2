@@ -1,23 +1,21 @@
-# Tomcat 10.1 use karein jo bug-free hai
+# Tomcat 10.1 (Latest Stable)
 FROM tomcat:10.1-jdk17-openjdk-slim
 
-# Purane webapps folder ko saaf karein
+# Purane files saaf karein
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# 1. Pura 'web' folder copy karein 'webapps-javaee' mein
-# Tomcat 10 isse automatically 'jakarta' mein convert kar dega
+# 1. 'web' folder copy karein conversion ke liye
 COPY web/ /usr/local/tomcat/webapps-javaee/ROOT/
 
-# 2. Src folder (Java classes) ko copy karein
-# Isse compilation errors (Only a type can be imported) khatam ho jayengi
+# 2. 'src' folder (Java files) copy karein
 COPY src/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/classes/
 
-# 3. Saari JAR libraries copy karein (Jo image_d43a6a.png mein dikh rahi hain)
+# 3. Libraries force copy karein
 COPY web/WEB-INF/lib/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/lib/
 
+# 4. Compiled classes agar local pe build ki hain toh unhe bhi copy karein
+# Note: Agar build/classes folder hai toh ye zaroori hai
+COPY build/web/WEB-INF/classes/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/classes/ 2>/dev/null || :
+
 EXPOSE 8080
-
-# Logging manager set karein
-ENV JAVA_OPTS="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
-
 CMD ["catalina.sh", "run"]
