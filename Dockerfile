@@ -1,16 +1,12 @@
-# Tomcat 9.0.89 ka exact stable version for Railway
-FROM tomcat:9.0.89-jdk17-openjdk-slim
+# Docker Hub ka sabse stable Tomcat 9 tag jo JDK 17 support karta hai
+FROM tomcat:9-jdk17-openjdk-slim
 
-# Purane webapps folder ko saaf karna
+# Purane webapps folder ko clear karein
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Pura 'web' folder copy karna
+# Files copy karein (Standard structure)
 COPY web/ /usr/local/tomcat/webapps/ROOT/
-
-# Java classes copy karna
 COPY src/ /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
-
-# External libraries (JARs) copy karna
 COPY web/WEB-INF/lib/ /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
 
 EXPOSE 8080
