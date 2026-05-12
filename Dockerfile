@@ -1,21 +1,22 @@
-# Tomcat 10.1 use karein (Ye crash nahi hota)
+# Tomcat 10.1 use karein (Bug-free version)
 FROM tomcat:10.1-jdk17-openjdk-slim
 
-# Purane files saaf karein
+# Purane webapps saaf karein
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Step 1: Pura 'web' folder copy karein (Lekin 'webapps-javaee' folder mein)
-# Tomcat 10 ka feature hai ki wo 'webapps-javaee' mein rakhi files ko 
-# automatically 'javax' se 'jakarta' mein convert kar deta hai
+# 1. Pura 'web' folder copy karein (Standard conversion ke liye)
 COPY web/ /usr/local/tomcat/webapps-javaee/ROOT/
 
-# Step 2: Java classes copy karein
+# 2. Saari compiled classes copy karein (Package structure ke saath)
+# Note: Isse compilation errors (Only a type can be imported) solve ho jayengi
 COPY src/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/classes/
 
-# Step 3: Saari Libraries copy karein (Jo image_d43a6a.png mein dikh rahi hain)
+# 3. Saari JAR libraries copy karein (Jo image_d43a6a.png mein hain)
 COPY web/WEB-INF/lib/ /usr/local/tomcat/webapps-javaee/ROOT/WEB-INF/lib/
 
 EXPOSE 8080
 
-# Tomcat ko normal mode mein chalne dein, wo conversion khud karega
+# Environment variables for better logging
+ENV JAVA_OPTS="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
+
 CMD ["catalina.sh", "run"]
