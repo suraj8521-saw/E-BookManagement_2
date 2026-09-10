@@ -30,10 +30,13 @@ public class EmailSendForUserContactUsPage {
                 return false;
             }
             configProps.load(is);
+final String userName = configProps.getProperty("mail.user");
 
-            final String userName = configProps.getProperty("mail.user");
-            final String password = configProps.getProperty("mail.pass");
-
+// Updated password handling with environment variable fallback
+String propPass = configProps.getProperty("mail.pass");
+final String password = (propPass == null || propPass.startsWith("${")) 
+                        ? System.getenv("EMAIL_PASSWORD") 
+                        : propPass;
             // 2. Setup SMTP Server Properties
             Properties smtpProps = new Properties();
             smtpProps.put("mail.smtp.auth", "true");
